@@ -2,7 +2,7 @@ import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import Pelicula from './Pelicula';
 
-const Peliculas = () => {
+const Peliculas = ({peliculas, borrarPelicula}) => {
     return (
         <section className='mx-0'>
             <header className='text-center p-3 border my-3'>
@@ -10,12 +10,11 @@ const Peliculas = () => {
             </header>
             <Container>
                 <Row className='d-flex justify-content-center'>
-                    <Col sm={6}>
-                        <Pelicula></Pelicula>
-                    </Col>
-                    <Col sm={6}>
-                        <Pelicula></Pelicula>
-                    </Col>
+                {peliculas.map((pelicula, indice)=>{
+                        return  <Col key={indice} sm={6}>
+                                    <Pelicula borrarPelicula={borrarPelicula}  pelicula={pelicula}></Pelicula>
+                                </Col>
+                    })}
                 </Row>
             </Container>
         </section>

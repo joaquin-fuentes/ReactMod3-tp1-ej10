@@ -1,30 +1,41 @@
 import React from 'react';
 import { Button, Col, Form, FloatingLabel, InputGroup, Row } from "react-bootstrap"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import Peliculas from "./Peliculas"
 
 const Formulario = () => {
 
     const [nombre, setNombre] = useState("")
-    const [apellido, setApellido] = useState("")
-    const [email, setEmail] = useState("")
-    const [documento, setDocumento] = useState("")
-    const [dato, setDato] = useState({})
-    const [datosUsuario, setDatosUsuario] = useState([])
+    const [descripcion, setDescripcion] = useState("")
+    const [genero, setGenero] = useState("")
+    let peliculasLocalStorage = JSON.parse(localStorage.getItem("listaPeliculas") || "[]")
+    const [peliculas, setPeliculas] = useState(peliculasLocalStorage)
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (nombre.length !== 0 && apellido.length !== 0 && email.length !== 0 && documento.length !== 0) {
-            setDato({ nombre: nombre, apellido: apellido, email: email, documento: documento })
-            setDatosUsuario([...datosUsuario, dato]);
-            setNombre("");
-            setApellido("");
-            setEmail("");
-            setDocumento("");
-            alert("Datos cargados")
-        } else {
-            alert("no fue posible cargar los datos, por favor complete todos los campos")
-        }
-    };
+
+
+     useEffect(() => {
+         localStorage.setItem("listaPeliculas", JSON.stringify(peliculas))
+     }, [peliculas])
+
+     const handleSubmit = (e) => {
+         e.preventDefault();
+         if (nombre.length !== 0 && descripcion.length !== 0 && genero.length !== 0 ) {
+             const nuevaPeli = { nombre: nombre, descripcion: descripcion, genero: genero}
+             setPeliculas([...peliculas, nuevaPeli]);
+             setNombre("");
+             setDescripcion("");
+             setGenero("");
+           
+             console.log("dato guardado:", (nuevaPeli));
+             alert("Nueva peli cargada")
+         } else {
+             alert("no fue posible cargar la peli, por favor complete todos los campos")
+         }
+     };
+     const borrarPelicula = (nombre) => {
+         let arregloFiltrado = peliculas.filter((pelicula) => pelicula.nombre !== nombre)
+         setPeliculas(arregloFiltrado)
+     }
 
 
     return (
@@ -39,7 +50,9 @@ const Formulario = () => {
                             Nombre:
                         </Form.Label>
                         <Col sm="10">
-                            <Form.Control type="text" placeholder="Ingrese el nombre de la pelicula" />
+                            <Form.Control type="text" placeholder="Ingrese el nombre de la pelicula" 
+                              onChange={(e) => setNombre(e.target.value)}
+                              value={nombre}/>
                         </Col>
                     </Form.Group>
                     <Form.Group as={Row} className="p-2 mx-0">
@@ -52,7 +65,10 @@ const Formulario = () => {
                                     as="textarea"
                                     placeholder="Leave a comment here"
                                     style={{ height: '100px' }}
+                                    onChange={(e) => setDescripcion(e.target.value)}
+                                    value={descripcion}
                                 />
+                                
                             </FloatingLabel>
                         </Col>
                     </Form.Group>
@@ -61,8 +77,11 @@ const Formulario = () => {
                             Género:
                         </Form.Label>
                         <Col sm="10">
-                            <Form.Select aria-label="Default select example">
-                                <option disabled>Seleccione un género</option>
+                            <Form.Select aria-label="Default select example"
+                              onChange={(e) => setGenero(e.target.value)}
+                              value={genero}
+                            >
+                                <option value="">Seleccione un género</option>
                                 <option value="comedia">Comedia</option>
                                 <option value="drama">Drama</option>
                                 <option value="infantil">Infantil</option>
@@ -75,6 +94,7 @@ const Formulario = () => {
                     <Button type="submit" className='rounded'>Dar de alta</Button>
                 </footer>
             </Form>
+            <Peliculas peliculas={peliculas} borrarPelicula={borrarPelicula}></Peliculas>
         </section>
     );
 };
